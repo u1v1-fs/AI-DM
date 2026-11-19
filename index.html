@@ -123,29 +123,42 @@
 
             <!-- TAB 2: REAL-TIME STREAMING AI CHAT -->
             <section id="view-chat" class="space-y-4 hidden">
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col h-[650px]">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col h-[680px]">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
                         <h2 class="text-base font-semibold text-cyan-300 flex items-center">
                             <i class="fa-solid fa-comments mr-2"></i> U1V1-FaHaM Streaming AI Advisor & Chat
                         </h2>
-                        <div class="flex items-center space-x-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             <label class="text-[11px] text-slate-400">LLM Engine:</label>
                             <select id="chat-api-select" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
                                 <!-- Populated dynamically -->
                             </select>
+                            <button type="button" onclick="exportChatBackup()" class="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-medium transition flex items-center">
+                                <i class="fa-solid fa-file-arrow-down mr-1"></i> Chat Backup
+                            </button>
+                            <button type="button" onclick="clearChat()" class="px-2.5 py-1 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 rounded-lg text-xs font-medium transition flex items-center">
+                                <i class="fa-solid fa-broom mr-1"></i> Clear Chat
+                            </button>
                         </div>
                     </div>
 
                     <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 pr-2 font-sans text-xs">
                         <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-300 max-w-xl">
                             <strong class="text-cyan-400 block mb-1">U1V1-FaHaM AI Advisor:</strong>
-                            Hello! I am ready with streaming responses, local Ollama support, OpenRouter free auto-routing (<code>openrouter/free</code>), and automatic fallback protection. Ask me anything!
+                            Hello! I am ready with streaming responses, file attachments, chat backup, and automatic fallback protection. Ask me anything!
                         </div>
                     </div>
 
-                    <form onsubmit="handleChatSubmit(event)" class="mt-4 pt-3 border-t border-slate-800 flex items-center space-x-2">
-                        <input type="text" id="chat-input" required placeholder="Type your question or query here..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
-                        <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-3 rounded-xl text-xs font-medium transition shadow-md">
+                    <!-- Attached Files Preview Bar -->
+                    <div id="chat-attachments-preview" class="hidden flex-wrap gap-2 mt-3 pt-2.5 border-t border-slate-800/80"></div>
+
+                    <form onsubmit="handleChatSubmit(event)" class="mt-3 pt-3 border-t border-slate-800 flex items-center space-x-2">
+                        <label title="Attach files (.txt, .js, .py, .json, .csv, .md, .pdf, images)" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 px-3.5 py-3 rounded-xl text-xs font-medium transition cursor-pointer flex items-center justify-center flex-shrink-0">
+                            <i class="fa-solid fa-paperclip"></i>
+                            <input type="file" id="chat-file-input" multiple accept=".txt,.md,.js,.jsx,.ts,.tsx,.html,.css,.json,.csv,.py,.sql,.log,.xml,.yaml,.yml,.pdf,image/*" onchange="handleChatFileSelect(event)" class="hidden">
+                        </label>
+                        <input type="text" id="chat-input" placeholder="Type your question or attach files and hit Send..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                        <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-3 rounded-xl text-xs font-medium transition shadow-md flex-shrink-0">
                             <i class="fa-solid fa-paper-plane mr-1"></i> Send
                         </button>
                     </form>
@@ -215,16 +228,16 @@
 
                     <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
                         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                            <strong class="text-amber-400 text-sm block">1. Immediate Auto-Backup System</strong>
-                            <p>Every time you add, update, or remove an API key or tool in the Vault, the application automatically backs up your configuration immediately to browser storage and allows one-click JSON file exports/imports.</p>
+                            <strong class="text-amber-400 text-sm block">1. Immediate Auto-Backup & Chat Backup</strong>
+                            <p>Every time you add, update, or remove an API key, tool, or chat message, the application saves a snapshot in browser storage. Use <strong>Chat Backup</strong> inside the chat tab to download a standalone chat transcript JSON file, or <strong>Clear Chat</strong> to reset the conversation.</p>
                         </div>
                         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                            <strong class="text-amber-400 text-sm block">2. OpenRouter Free Auto-Router (<code>openrouter/free</code>)</strong>
-                            <p>Using <code class="text-cyan-400">openrouter/free</code> as your model string automatically routes requests across available zero-cost models on OpenRouter without ever falling back to paid models.</p>
+                            <strong class="text-amber-400 text-sm block">2. File Attachments in AI Chat</strong>
+                            <p>Click the paperclip icon to attach text/code/data files (read directly into prompt context) or images/PDFs (sent as base64/inline data to multimodal models like Gemini and OpenRouter).</p>
                         </div>
                         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                            <strong class="text-amber-400 text-sm block">3. Localhost Ollama CORS Setup</strong>
-                            <p>Ollama serves an OpenAI-compatible API at <code class="text-cyan-400">http://localhost:11434/v1/chat/completions</code>. If your browser blocks cross-origin requests from a local HTML file, set <code class="text-emerald-400">OLLAMA_ORIGINS=*</code> in your environment variables and restart Ollama.</p>
+                            <strong class="text-amber-400 text-sm block">3. OpenRouter Free Auto-Router & Localhost Ollama</strong>
+                            <p>Use <code class="text-cyan-400">openrouter/free</code> on OpenRouter to route across zero-cost models, or run Ollama locally at <code class="text-cyan-400">http://localhost:11434/v1/chat/completions</code> with <code class="text-emerald-400">OLLAMA_ORIGINS=*</code>.</p>
                         </div>
                     </div>
 
@@ -353,8 +366,11 @@
             { id: 'm42', name: 'Ideogram', category: 'media', rating: 4.7, email: 'dev@gmail.com', browser: 'Brave Profile 4', url: 'https://ideogram.ai', pro: 'Unmatched AI typography, logo rendering, and poster text accuracy.', con: 'Weekly free generation queue can be slower during peak hours.', isCore: true, cheatsheetUrl: 'https://github.com/atryx/prompt-engineering-cheatsheet' }
         ];
 
-        // Load saved configs and migrate OpenRouter & Ollama presets cleanly
-        let savedApiConfigs = JSON.parse(localStorage.getItem('faham_api_v31')) || JSON.parse(localStorage.getItem('faham_api_v30')) || JSON.parse(localStorage.getItem('faham_api_v29')) || JSON.parse(localStorage.getItem('faham_api_v28')) || defaultApiConfigs;
+        const defaultWelcomeChat = [
+            { sender: 'ai', text: 'Hello! I am your U1V1-FaHaM AI assistant connected to your streaming pipeline, file attachments, chat backup, and automatic fallback protection. Ask me anything!', attachments: [] }
+        ];
+
+        let savedApiConfigs = JSON.parse(localStorage.getItem('faham_api_v32')) || JSON.parse(localStorage.getItem('faham_api_v31')) || JSON.parse(localStorage.getItem('faham_api_v30')) || JSON.parse(localStorage.getItem('faham_api_v29')) || JSON.parse(localStorage.getItem('faham_api_v28')) || defaultApiConfigs;
         if (!savedApiConfigs.some(c => c.id === 'api-ollama' || c.provider === 'ollama')) {
             savedApiConfigs.splice(1, 0, defaultApiConfigs[1]);
         }
@@ -365,21 +381,22 @@
             return cfg;
         });
 
+        let pendingAttachments = [];
+
         let appState = {
             currentTab: 'generator',
             activeCategory: 'all',
             apiConfigs: savedApiConfigs,
-            tools: JSON.parse(localStorage.getItem('faham_vault_v31')) || JSON.parse(localStorage.getItem('faham_vault_v30')) || JSON.parse(localStorage.getItem('faham_vault_v29')) || masterTools,
-            history: JSON.parse(localStorage.getItem('faham_history_v31')) || JSON.parse(localStorage.getItem('faham_history_v30')) || JSON.parse(localStorage.getItem('faham_history_v29')) || JSON.parse(localStorage.getItem('faham_history_v28')) || [],
-            chatMessages: [
-                { sender: 'ai', text: 'Hello! I am your U1V1-FaHaM AI assistant connected to your streaming pipeline, Localhost Ollama, OpenRouter free auto-router (openrouter/free), and automatic backup protection. Ask me anything!' }
-            ]
+            tools: JSON.parse(localStorage.getItem('faham_vault_v32')) || JSON.parse(localStorage.getItem('faham_vault_v31')) || JSON.parse(localStorage.getItem('faham_vault_v30')) || JSON.parse(localStorage.getItem('faham_vault_v29')) || masterTools,
+            history: JSON.parse(localStorage.getItem('faham_history_v32')) || JSON.parse(localStorage.getItem('faham_history_v31')) || JSON.parse(localStorage.getItem('faham_history_v30')) || JSON.parse(localStorage.getItem('faham_history_v29')) || JSON.parse(localStorage.getItem('faham_history_v28')) || [],
+            chatMessages: JSON.parse(localStorage.getItem('faham_chat_v32')) || defaultWelcomeChat
         };
 
         function persistState() {
-            localStorage.setItem('faham_api_v31', JSON.stringify(appState.apiConfigs));
-            localStorage.setItem('faham_vault_v31', JSON.stringify(appState.tools));
-            localStorage.setItem('faham_history_v31', JSON.stringify(appState.history));
+            localStorage.setItem('faham_api_v32', JSON.stringify(appState.apiConfigs));
+            localStorage.setItem('faham_vault_v32', JSON.stringify(appState.tools));
+            localStorage.setItem('faham_history_v32', JSON.stringify(appState.history));
+            localStorage.setItem('faham_chat_v32', JSON.stringify(appState.chatMessages));
             
             const backupPayload = JSON.stringify(appState, null, 2);
             localStorage.setItem('faham_auto_snapshot_backup', backupPayload);
@@ -397,6 +414,137 @@
             downloadAnchor.remove();
         }
 
+        function exportChatBackup() {
+            const chatApiSelect = document.getElementById('chat-api-select');
+            const selectedEngine = chatApiSelect ? chatApiSelect.options[chatApiSelect.selectedIndex]?.text || chatApiSelect.value : 'default';
+            const chatPayload = {
+                suite: 'U1V1-FaHaM-AI-Tool',
+                exportedAt: new Date().toISOString(),
+                engine: selectedEngine,
+                messageCount: appState.chatMessages.length,
+                messages: appState.chatMessages
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(chatPayload, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `U1V1_FaHaM_Chat_Backup_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function clearChat() {
+            if (appState.chatMessages.length <= 1 && appState.chatMessages[0]?.sender === 'ai') return;
+            if (confirm("Clear all messages in the current chat session?")) {
+                appState.chatMessages = [...defaultWelcomeChat];
+                pendingAttachments = [];
+                renderPendingAttachments();
+                persistState();
+            }
+        }
+
+        function isTextLikeFile(file) {
+            const textMimePrefixes = ['text/', 'application/json', 'application/xml', 'application/javascript', 'application/x-javascript', 'application/sql', 'application/yaml'];
+            const textExtensions = ['.txt', '.md', '.js', '.jsx', '.ts', '.tsx', '.html', '.htm', '.css', '.json', '.csv', '.py', '.sql', '.log', '.xml', '.yaml', '.yml', '.sh', '.env'];
+            const lowerName = file.name.toLowerCase();
+            return textMimePrefixes.some(p => file.type.startsWith(p)) || textExtensions.some(ext => lowerName.endsWith(ext));
+        }
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
+                reader.readAsText(file);
+            });
+        }
+
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error(`Failed to encode ${file.name}`));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleChatFileSelect(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
+
+            for (const file of files) {
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`Skipped "${file.name}" because it exceeds the 10 MB attachment limit.`);
+                    continue;
+                }
+
+                try {
+                    if (isTextLikeFile(file)) {
+                        const textContent = await readFileAsText(file);
+                        pendingAttachments.push({
+                            id: 'att-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+                            name: file.name,
+                            mimeType: file.type || 'text/plain',
+                            size: file.size,
+                            kind: 'text',
+                            textContent: textContent.slice(0, 60000)
+                        });
+                    } else {
+                        const dataUrl = await readFileAsDataUrl(file);
+                        const base64Data = dataUrl.includes(',') ? dataUrl.split(',')[1] : '';
+                        pendingAttachments.push({
+                            id: 'att-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+                            name: file.name,
+                            mimeType: file.type || 'application/octet-stream',
+                            size: file.size,
+                            kind: file.type.startsWith('image/') ? 'image' : 'binary',
+                            dataUrl,
+                            base64Data
+                        });
+                    }
+                } catch (err) {
+                    alert(err.message);
+                }
+            }
+
+            event.target.value = '';
+            renderPendingAttachments();
+        }
+
+        function removePendingAttachment(attachmentId) {
+            pendingAttachments = pendingAttachments.filter(a => a.id !== attachmentId);
+            renderPendingAttachments();
+        }
+
+        function renderPendingAttachments() {
+            const previewEl = document.getElementById('chat-attachments-preview');
+            if (!previewEl) return;
+
+            if (!pendingAttachments.length) {
+                previewEl.classList.add('hidden');
+                previewEl.classList.remove('flex');
+                previewEl.innerHTML = '';
+                return;
+            }
+
+            previewEl.classList.remove('hidden');
+            previewEl.classList.add('flex');
+            previewEl.innerHTML = pendingAttachments.map(att => {
+                const iconClass = att.kind === 'image' ? 'fa-image text-amber-400' : (att.kind === 'text' ? 'fa-file-code text-cyan-400' : 'fa-file-pdf text-rose-400');
+                const kb = Math.max(1, Math.round(att.size / 1024));
+                return `
+                    <div class="flex items-center space-x-2 bg-slate-950 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-200">
+                        <i class="fa-solid ${iconClass}"></i>
+                        <span class="max-w-[160px] truncate font-medium">${escapeHtml(att.name)}</span>
+                        <span class="text-slate-500">(${kb} KB)</span>
+                        <button type="button" onclick="removePendingAttachment('${att.id}')" class="text-slate-400 hover:text-rose-400 ml-1" title="Remove attachment">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function importJsonBackup(event) {
             const fileReader = new FileReader();
             if(event.target.files[0]) {
@@ -405,9 +553,13 @@
                     try {
                         const importedData = JSON.parse(e.target.result);
                         if(importedData.apiConfigs && importedData.tools) {
-                            appState = importedData;
+                            appState = {
+                                ...appState,
+                                ...importedData,
+                                chatMessages: importedData.chatMessages || appState.chatMessages
+                            };
                             persistState();
-                            alert("Vault and API Keys successfully restored from backup!");
+                            alert("Vault, Chat, and API Keys successfully restored from backup!");
                         } else {
                             alert("Invalid backup file format.");
                         }
@@ -451,6 +603,7 @@
             renderVaultGrid();
             renderHistoryList();
             renderChatMessages();
+            renderPendingAttachments();
         }
 
         function isConfigReady(cfg) {
@@ -591,16 +744,31 @@
             chatBox.innerHTML = '';
             appState.chatMessages.forEach(msg => {
                 const isAi = msg.sender === 'ai';
+                const attBadges = Array.isArray(msg.attachments) && msg.attachments.length
+                    ? `<div class="flex flex-wrap gap-1.5 mb-2">${msg.attachments.map(a => `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] ${isAi ? 'bg-slate-800 text-cyan-300' : 'bg-indigo-800/80 text-indigo-100'}"><i class="fa-solid fa-paperclip mr-1"></i>${escapeHtml(a.name)}</span>`).join('')}</div>`
+                    : '';
                 chatBox.innerHTML += `
                     <div class="flex ${isAi ? 'justify-start' : 'justify-end'}">
                         <div class="max-w-xl rounded-xl p-3 text-xs ${isAi ? 'bg-slate-950 border border-slate-800 text-slate-200' : 'bg-indigo-600 text-white'}">
                             <strong class="block mb-1 opacity-75">${isAi ? 'FaHaM Live AI Advisor' : 'You'}</strong>
-                            <div class="whitespace-pre-wrap">${msg.text}</div>
+                            ${attBadges}
+                            <div class="whitespace-pre-wrap">${escapeHtml(msg.text)}</div>
                         </div>
                     </div>
                 `;
             });
             chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function buildTextContextFromAttachments(attachments) {
+            if (!attachments || !attachments.length) return '';
+            const parts = attachments.map(att => {
+                if (att.kind === 'text') {
+                    return `\n--- Attached File: ${att.name} ---\n${att.textContent}\n--- End File: ${att.name} ---`;
+                }
+                return `\n[Attached Binary/Media File: ${att.name} (${att.mimeType})]`;
+            });
+            return parts.join('\n');
         }
 
         async function handleChatSubmit(e) {
@@ -610,15 +778,24 @@
             const chatApiSelect = document.getElementById('chat-api-select');
             const configId = chatApiSelect ? chatApiSelect.value : 'fallback-local';
             const cfg = appState.apiConfigs.find(c => c.id === configId);
+            const currentAttachments = [...pendingAttachments];
 
-            if(!query) return;
+            if(!query && !currentAttachments.length) return;
 
-            appState.chatMessages.push({ sender: 'user', text: query });
+            const displayText = query || `Please analyze the attached file(s): ${currentAttachments.map(a => a.name).join(', ')}`;
+            const attachmentSummary = currentAttachments.map(a => ({ name: a.name, mimeType: a.mimeType, kind: a.kind }));
+
+            appState.chatMessages.push({ sender: 'user', text: displayText, attachments: attachmentSummary });
             input.value = '';
+            pendingAttachments = [];
+            renderPendingAttachments();
             renderChatMessages();
 
-            appState.chatMessages.push({ sender: 'ai', text: 'Streaming response...' });
+            appState.chatMessages.push({ sender: 'ai', text: 'Streaming response...', attachments: [] });
             renderChatMessages();
+
+            const fileTextBlock = buildTextContextFromAttachments(currentAttachments);
+            const enrichedQuery = `${displayText}${fileTextBlock}`;
 
             try {
                 let aiResponseText = "";
@@ -630,7 +807,18 @@
                     try {
                         if (cfg.provider === 'gemini') {
                             const targetUrl = `${cfg.url}?key=${cfg.key}`;
-                            const payload = { contents: [{ parts: [{ text: `You are an expert software engineering advisor for the U1V1-FaHaM ecosystem. Answer concisely and accurately:\n\n${query}` }] }] };
+                            const parts = [{ text: `You are an expert software engineering advisor for the U1V1-FaHaM ecosystem. Answer concisely and accurately:\n\n${enrichedQuery}` }];
+                            currentAttachments.forEach(att => {
+                                if (att.kind !== 'text' && att.base64Data) {
+                                    parts.push({
+                                        inlineData: {
+                                            mimeType: att.mimeType,
+                                            data: att.base64Data
+                                        }
+                                    });
+                                }
+                            });
+                            const payload = { contents: [{ parts }] };
                             const res = await fetch(targetUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                             const data = await res.json();
                             if (!res.ok) throw new Error(data.error?.message || 'Gemini API error');
@@ -642,7 +830,22 @@
                             if (cfg.provider === 'openrouter') {
                                 headers['X-Title'] = 'U1V1-FaHaM-AI-Tool';
                             }
-                            const payload = { model: cfg.model, messages: [{ role: "system", content: "You are an expert AI software architect for U1V1-FaHaM." }, { role: "user", content: query }], temperature: 0.3 };
+
+                            let userContent = enrichedQuery;
+                            const hasMedia = currentAttachments.some(a => a.kind !== 'text' && a.dataUrl);
+                            if (hasMedia) {
+                                const contentArray = [{ type: 'text', text: enrichedQuery }];
+                                currentAttachments.forEach(att => {
+                                    if (att.kind === 'image' && att.dataUrl) {
+                                        contentArray.push({ type: 'image_url', image_url: { url: att.dataUrl } });
+                                    } else if (att.mimeType === 'application/pdf' && att.dataUrl) {
+                                        contentArray.push({ type: 'file', file: { filename: att.name, file_data: att.dataUrl } });
+                                    }
+                                });
+                                userContent = contentArray;
+                            }
+
+                            const payload = { model: cfg.model, messages: [{ role: "system", content: "You are an expert AI software architect for U1V1-FaHaM." }, { role: "user", content: userContent }], temperature: 0.3 };
                             const res = await fetch(targetUrl, { method: 'POST', headers, body: JSON.stringify(payload) });
                             const data = await res.json();
                             if (!res.ok) throw new Error(data.error?.message || 'API error');
@@ -655,8 +858,12 @@
 
                 if (useLocalFallback) {
                     await new Promise(r => setTimeout(r, 300));
-                    const q = query.toLowerCase();
-                    if (q.includes('database') || q.includes('sql') || q.includes('prisma')) {
+                    const q = enrichedQuery.toLowerCase();
+                    const attachedNames = currentAttachments.map(a => a.name).join(', ');
+                    if (attachedNames) {
+                        const textPreviews = currentAttachments.filter(a => a.kind === 'text').map(a => `• **${a.name}**: ${a.textContent.trim().split('\n').slice(0, 4).join(' | ').slice(0, 180)}`).join('\n');
+                        aiResponseText = `💡 [U1V1-FaHaM Advisor]: Received attachment(s): ${attachedNames}.\n${textPreviews ? textPreviews + '\n' : ''}For full vision/PDF inspection, ensure a multimodal endpoint (such as Gemini or OpenRouter) is connected, or ask specific questions about the attached text above.`;
+                    } else if (q.includes('database') || q.includes('sql') || q.includes('prisma')) {
                         aiResponseText = `💡 [U1V1-FaHaM Advisor]: Regarding "${query}", for robust data persistence in your stack, PostgreSQL with Prisma ORM or Supabase provides excellent relational support and real-time triggers.`;
                     } else if (q.includes('auth') || q.includes('login') || q.includes('jwt')) {
                         aiResponseText = `💡 [U1V1-FaHaM Advisor]: Regarding "${query}", for secure authentication, implement HttpOnly cookies for JWT storage or utilize managed providers like Clerk.`;
@@ -669,7 +876,7 @@
 
                 appState.chatMessages.pop();
                 let streamedText = "";
-                appState.chatMessages.push({ sender: 'ai', text: streamedText });
+                appState.chatMessages.push({ sender: 'ai', text: streamedText, attachments: [] });
                 renderChatMessages();
 
                 for (let i = 0; i < aiResponseText.length; i += 3) {
@@ -679,10 +886,12 @@
                     await new Promise(r => setTimeout(r, 10));
                 }
 
+                persistState();
+
             } catch (err) {
                 appState.chatMessages.pop();
-                appState.chatMessages.push({ sender: 'ai', text: `Advisor Notice: Local streaming fallback engaged successfully.` });
-                renderChatMessages();
+                appState.chatMessages.push({ sender: 'ai', text: `Advisor Notice: Local streaming fallback engaged successfully.`, attachments: [] });
+                persistState();
             }
         }
 
@@ -701,7 +910,7 @@
             list.innerHTML = '';
             document.getElementById('history-count').textContent = `${appState.history.length} items`;
             appState.history.forEach(item => {
-                list.innerHTML += `<div onclick="loadHistoryItem('${item.id}')" class="bg-slate-950 border border-slate-800 rounded-xl p-2 cursor-pointer text-xs"><strong class="text-slate-200">${item.title}</strong><span class="text-[10px] text-cyan-400 block">${item.providerName}</span></div>`;
+                list.innerHTML += `<div onclick="loadHistoryItem('${item.id}')" class="bg-slate-950 border border-slate-800 rounded-xl p-2 cursor-pointer text-xs"><strong class="text-slate-200">${escapeHtml(item.title)}</strong><span class="text-[10px] text-cyan-400 block">${escapeHtml(item.providerName)}</span></div>`;
             });
         }
 
@@ -743,7 +952,7 @@ export default function ${title.replace(/[^a-zA-Z0-9]/g, '')}() {
                 return;
             }
 
-            outputContainer.innerHTML = `<div class="text-cyan-400">Requesting ${cfg.name} (${cfg.model})...</div>`;
+            outputContainer.innerHTML = `<div class="text-cyan-400">Requesting ${escapeHtml(cfg.name)} (${escapeHtml(cfg.model)})...</div>`;
             try {
                 let code = "";
                 if (cfg.provider === 'gemini') {
@@ -773,7 +982,7 @@ export default function ${title.replace(/[^a-zA-Z0-9]/g, '')}() {
                 displayCodeOutput(artifact);
             } catch(err) {
                 const ollamaHint = cfg.provider === 'ollama' ? ' Ensure Ollama is running on localhost:11434 with OLLAMA_ORIGINS=*.' : '';
-                outputContainer.innerHTML = `<div class="text-amber-400 p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 mb-2">Endpoint Notice (${err.message}).${ollamaHint} Engaging ⚡ Zero-Key Local Smart Fallback automatically...</div>`;
+                outputContainer.innerHTML = `<div class="text-amber-400 p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 mb-2">Endpoint Notice (${escapeHtml(err.message)}).${escapeHtml(ollamaHint)} Engaging ⚡ Zero-Key Local Smart Fallback automatically...</div>`;
                 setTimeout(() => {
                     const fallbackCode = `// ==========================================
 // Project: ${title} (Smart Fallback Mode)
@@ -919,7 +1128,7 @@ export default function ${title.replace(/[^a-zA-Z0-9]/g, '')}() {
             }
         }
 
-        function escapeHtml(text) { return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+        function escapeHtml(text) { return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
         autofillPreset();
         renderApp();
