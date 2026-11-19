@@ -8,12 +8,125 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Arabic Calligraphy Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,700;1,700&family=Scheherazade+New:wght@700&display=swap" rel="stylesheet">
+    <style>
+        .arabic-calligraphy {
+            font-family: 'Scheherazade New', 'Amiri', serif;
+            direction: rtl;
+        }
+        @keyframes goldShimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        @keyframes sparklePulse {
+            0%, 100% { opacity: 0.25; transform: scale(0.8) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.25) rotate(18deg); }
+        }
+        @keyframes borderGlow {
+            0%, 100% { box-shadow: 0 0 18px rgba(245, 158, 11, 0.22), inset 0 0 14px rgba(16, 185, 129, 0.12); }
+            50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.48), inset 0 0 22px rgba(245, 158, 11, 0.24); }
+        }
+        .glitter-text {
+            background: linear-gradient(
+                90deg,
+                #fde047 0%,
+                #f59e0b 20%,
+                #ffffff 35%,
+                #fbbf24 50%,
+                #34d399 68%,
+                #ffffff 82%,
+                #fde047 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: goldShimmer 4.2s linear infinite;
+            filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.45));
+        }
+        .glitter-banner {
+            animation: borderGlow 3.6s ease-in-out infinite;
+        }
+        .sparkle-star {
+            animation: sparklePulse 2.4s ease-in-out infinite;
+        }
+        .sparkle-delay-1 { animation-delay: 0.5s; }
+        .sparkle-delay-2 { animation-delay: 1.1s; }
+        .sparkle-delay-3 { animation-delay: 1.7s; }
+        .protected-surface {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        input, textarea, select, pre, code {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between protected-surface">
 
-    <div>
+    <!-- ACTIVATION LOCK OVERLAY -->
+    <div id="activation-overlay" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-lg w-full p-7 space-y-5 shadow-2xl shadow-amber-500/10">
+            <div class="flex items-center space-x-3.5 border-b border-slate-800 pb-4">
+                <div class="w-12 h-12 rounded-xl border border-amber-500/60 flex items-center justify-center bg-gradient-to-br from-amber-950 via-slate-900 to-emerald-950 flex-shrink-0">
+                    <i class="fa-solid fa-shield-halved text-amber-400 text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold bg-gradient-to-r from-amber-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">U1V1-FaHaM License Activation</h2>
+                    <p class="text-[11px] text-slate-400">Device-Bound Security Gate • UNITE ONE WE WON</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Your Unique Device ID</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Hardware Bound</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="client-device-id" readonly class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 font-mono text-sm font-bold text-amber-400 tracking-wider focus:outline-none">
+                    <button type="button" onclick="copyDeviceId()" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-xl text-xs font-medium border border-slate-700 transition flex items-center">
+                        <i class="fa-solid fa-copy mr-1.5"></i> Copy ID
+                    </button>
+                </div>
+                <p class="text-[11px] text-slate-500">Share this Device ID with the administrator to receive a time-bound activation key.</p>
+            </div>
+
+            <form onsubmit="handleActivateApp(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1.5">Enter Activation Key</label>
+                    <input type="text" id="activation-key-input" required placeholder="U1V1-YYYYMMDD-XXXXXXXXXXXX" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 font-mono text-sm text-emerald-300 uppercase tracking-wider focus:outline-none focus:border-amber-500">
+                </div>
+                <div id="activation-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/30 rounded-xl p-3"></div>
+                <button type="submit" class="w-full bg-gradient-to-r from-amber-500 via-amber-600 to-emerald-600 hover:from-amber-400 hover:to-emerald-500 text-slate-950 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-amber-500/20 flex items-center justify-center">
+                    <i class="fa-solid fa-key mr-2"></i> Verify & Unlock U1V1 Suite
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-shell" class="hidden">
+        <!-- TOP ARABIC CALLIGRAPHY BANNER -->
+        <div class="relative overflow-hidden bg-gradient-to-r from-slate-950 via-amber-950/40 to-slate-950 border-b border-amber-500/30 py-3 px-4 text-center glitter-banner">
+            <!-- Decorative Sparkling Stars -->
+            <span class="sparkle-star text-amber-300 text-xs absolute left-6 top-2.5 pointer-events-none">✦</span>
+            <span class="sparkle-star sparkle-delay-1 text-emerald-300 text-[10px] absolute left-1/4 bottom-2 pointer-events-none">✧</span>
+            <span class="sparkle-star sparkle-delay-2 text-amber-200 text-xs absolute right-1/4 top-2 pointer-events-none">✦</span>
+            <span class="sparkle-star sparkle-delay-3 text-yellow-300 text-xs absolute right-6 bottom-2.5 pointer-events-none">✧</span>
+
+            <p class="arabic-calligraphy glitter-text text-xl sm:text-2xl md:text-[26px] font-bold leading-relaxed tracking-wide">
+                أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ ﴿﴾ بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+            </p>
+            <p class="text-[10px] sm:text-[11px] text-amber-200/80 tracking-wide mt-0.5 font-normal">
+                I seek refuge in Allah from the accursed Satan • In the name of Allah, the Most Gracious, the Most Merciful
+            </p>
+        </div>
+
         <!-- Header -->
-        <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-6 py-4 flex items-center justify-between shadow-lg">
+        <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 px-6 py-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
             <div class="flex items-center space-x-3.5">
                 <!-- Permanent Embedded U1V1 Logo Emblem -->
                 <div class="w-12 h-12 rounded-xl overflow-hidden border border-amber-500/60 shadow-lg shadow-amber-500/30 flex items-center justify-center bg-gradient-to-br from-amber-950 via-slate-900 to-emerald-950 flex-shrink-0 relative">
@@ -32,7 +145,10 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-amber-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">U1V1-FaHaM-AI-Tool</h1>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-amber-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">U1V1-FaHaM-AI-Tool</h1>
+                        <span id="license-status-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-medium">Licensed</span>
+                    </div>
                     <p class="text-[10px] text-slate-400 tracking-wider">UNITE ONE WE WON — FaHaM Suite</p>
                 </div>
             </div>
@@ -219,24 +335,33 @@
             <!-- TAB 5: HELP & GUIDE WEBPAGE -->
             <section id="view-help" class="space-y-6 hidden">
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 space-y-6 shadow-xl max-w-4xl mx-auto">
-                    <div class="border-b border-slate-800 pb-4">
-                        <h2 class="text-xl font-bold text-cyan-400 flex items-center">
-                            <i class="fa-solid fa-circle-question mr-2.5"></i> U1V1-FaHaM-AI-Tool - Complete User Guide & Write-Up
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-1">Comprehensive documentation with automatic backup protection.</p>
+                    <div class="border-b border-slate-800 pb-4 flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                            <h2 class="text-xl font-bold text-cyan-400 flex items-center">
+                                <i class="fa-solid fa-circle-question mr-2.5"></i> U1V1-FaHaM-AI-Tool - Complete User Guide & License Info
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">Comprehensive documentation with device-bound licensing and automatic backup protection.</p>
+                        </div>
+                        <button type="button" onclick="deactivateLicense()" class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-xl text-xs font-medium transition">
+                            <i class="fa-solid fa-lock mr-1"></i> Lock / Change License
+                        </button>
                     </div>
 
                     <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
                         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                            <strong class="text-amber-400 text-sm block">1. Immediate Auto-Backup & Chat Backup</strong>
+                            <strong class="text-amber-400 text-sm block">1. Device-Bound Activation Key</strong>
+                            <p>Your Device ID (<span id="help-device-id" class="font-mono text-cyan-400"></span>) is bound to this browser environment. Active License Expiry: <span id="help-license-expiry" class="font-mono text-emerald-400"></span>.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <strong class="text-amber-400 text-sm block">2. Immediate Auto-Backup & Chat Backup</strong>
                             <p>Every time you add, update, or remove an API key, tool, or chat message, the application saves a snapshot in browser storage. Use <strong>Chat Backup</strong> inside the chat tab to download a standalone chat transcript JSON file, or <strong>Clear Chat</strong> to reset the conversation.</p>
                         </div>
                         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                            <strong class="text-amber-400 text-sm block">2. File Attachments in AI Chat</strong>
+                            <strong class="text-amber-400 text-sm block">3. File Attachments in AI Chat</strong>
                             <p>Click the paperclip icon to attach text/code/data files (read directly into prompt context) or images/PDFs (sent as base64/inline data to multimodal models like Gemini and OpenRouter).</p>
                         </div>
                         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-                            <strong class="text-amber-400 text-sm block">3. OpenRouter Free Auto-Router & Localhost Ollama</strong>
+                            <strong class="text-amber-400 text-sm block">4. OpenRouter Free Auto-Router & Localhost Ollama</strong>
                             <p>Use <code class="text-cyan-400">openrouter/free</code> on OpenRouter to route across zero-cost models, or run Ollama locally at <code class="text-cyan-400">http://localhost:11434/v1/chat/completions</code> with <code class="text-emerald-400">OLLAMA_ORIGINS=*</code>.</p>
                         </div>
                     </div>
@@ -252,7 +377,7 @@
     </div>
 
     <!-- Hidden Signature Footer / Obfuscated Credit -->
-    <footer class="bg-slate-900 border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-500">
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-400">
         <div id="obfuscated-footer"></div>
     </footer>
 
@@ -301,15 +426,184 @@
 
     <!-- Application Script Engine -->
     <script>
-        // Inject Hidden Credit
-        document.addEventListener("DOMContentLoaded", () => {
-            const p1 = ["Prepared by ", "Habib", ", Jazak Allahu Khayran"];
-            const footerEl = document.getElementById("obfuscated-footer");
-            if(footerEl) {
-                footerEl.innerHTML = `${p1[0]}<span class="text-amber-400 font-semibold">${p1[1]}</span>${p1[2]}`;
-            }
-        });
+        (function(){
+            // Balanced Source Protection Guards
+            document.addEventListener('contextmenu', function(e) {
+                const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+                if (tag !== 'input' && tag !== 'textarea') {
+                    e.preventDefault();
+                }
+            });
+            document.addEventListener('keydown', function(e) {
+                if (
+                    e.key === 'F12' ||
+                    (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'K'].includes(e.key.toUpperCase())) ||
+                    (e.ctrlKey && e.key.toUpperCase() === 'U')
+                ) {
+                    e.preventDefault();
+                }
+            });
 
+            // Reconstruct Attribution Without Plaintext Author Literal in Source
+            const _c = [0x48, 0x61, 0x62, 0x69, 0x62];
+            const _sig = String.fromCharCode.apply(null, _c);
+            const _pre = atob("UHJlcGFyZWQgYnkg");
+            const _suf = atob("LCBKYXphayBBbGxhaHUgS2hheXJhbg==");
+
+            function mountFooter() {
+                const el = document.getElementById("obfuscated-footer");
+                if (el) {
+                    el.innerHTML = `${_pre}<span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-400/40 font-bold tracking-wide shadow-sm shadow-amber-500/20">${_sig}</span>${_suf}`;
+                }
+            }
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", mountFooter);
+            } else {
+                mountFooter();
+            }
+        })();
+
+        // ==========================================
+        // DEVICE ID & ACTIVATION KEY ENGINE
+        // ==========================================
+        const _0x5a1 = atob("VTFWMS1GQUhBTS1TRUNVUkUtU0FMVC0yMDI2");
+
+        function fnv1aHash(str) {
+            let h = 0x811c9dc5;
+            for (let i = 0; i < str.length; i++) {
+                h ^= str.charCodeAt(i);
+                h = Math.imul(h, 0x01000193);
+            }
+            return (h >>> 0).toString(16).toUpperCase().padStart(8, '0');
+        }
+
+        function getOrCreateDeviceId() {
+            let storedId = localStorage.getItem('u1v1_device_id_v1');
+            if (storedId && /^U1V1-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}$/.test(storedId)) {
+                return storedId;
+            }
+            const rawFingerprint = [
+                navigator.userAgent || '',
+                navigator.language || '',
+                screen.width + 'x' + screen.height,
+                screen.colorDepth || '',
+                Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+                navigator.hardwareConcurrency || '4'
+            ].join('|');
+            const h1 = fnv1aHash(rawFingerprint);
+            const h2 = fnv1aHash(rawFingerprint.split('').reverse().join(''));
+            const combined = (h1 + h2).slice(0, 12);
+            const deviceId = `U1V1-${combined.slice(0, 4)}-${combined.slice(4, 8)}-${combined.slice(8, 12)}`;
+            localStorage.setItem('u1v1_device_id_v1', deviceId);
+            return deviceId;
+        }
+
+        function computeExpectedActivationKey(deviceId, expiryCompact) {
+            const cleanDevice = deviceId.trim().toUpperCase();
+            const payload = `${cleanDevice}::${expiryCompact}::${_0x5a1}`;
+            const p1 = fnv1aHash(payload);
+            const p2 = fnv1aHash(payload.split('').reverse().join('') + '::U1V1');
+            const sig = (p1 + p2).slice(0, 12);
+            return `U1V1-${expiryCompact}-${sig}`;
+        }
+
+        function validateActivationKey(deviceId, inputKey) {
+            const cleaned = (inputKey || '').trim().toUpperCase();
+            const match = cleaned.match(/^U1V1-(\d{8})-([A-F0-9]{12})$/);
+            if (!match) {
+                return { valid: false, reason: 'Invalid key format. Expected U1V1-YYYYMMDD-XXXXXXXXXXXX.' };
+            }
+            const expiryCompact = match[1];
+            const expectedKey = computeExpectedActivationKey(deviceId, expiryCompact);
+            if (cleaned !== expectedKey) {
+                return { valid: false, reason: 'Activation key does not match this Device ID.' };
+            }
+
+            const year = parseInt(expiryCompact.slice(0, 4), 10);
+            const month = parseInt(expiryCompact.slice(4, 6), 10);
+            const day = parseInt(expiryCompact.slice(6, 8), 10);
+            const expiryDate = new Date(year, month - 1, day, 23, 59, 59, 999);
+            if (isNaN(expiryDate.getTime())) {
+                return { valid: false, reason: 'Invalid expiry date encoded in key.' };
+            }
+            if (new Date() > expiryDate) {
+                return { valid: false, reason: `License expired on ${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}.` };
+            }
+
+            const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            return { valid: true, expiryFormatted: formattedDate, expiryCompact };
+        }
+
+        function copyDeviceId() {
+            const devId = document.getElementById('client-device-id').value;
+            navigator.clipboard.writeText(devId);
+            alert('Device ID copied: ' + devId);
+        }
+
+        function unlockInterface(deviceId, validationResult) {
+            document.getElementById('activation-overlay').classList.add('hidden');
+            document.getElementById('app-shell').classList.remove('hidden');
+            const badge = document.getElementById('license-status-badge');
+            if (badge) {
+                badge.textContent = validationResult.expiryFormatted === '2099-12-31'
+                    ? 'Lifetime Active'
+                    : `Valid thru ${validationResult.expiryFormatted}`;
+            }
+            const helpDevEl = document.getElementById('help-device-id');
+            const helpExpEl = document.getElementById('help-license-expiry');
+            if (helpDevEl) helpDevEl.textContent = deviceId;
+            if (helpExpEl) helpExpEl.textContent = validationResult.expiryFormatted;
+        }
+
+        function handleActivateApp(e) {
+            e.preventDefault();
+            const deviceId = getOrCreateDeviceId();
+            const keyInput = document.getElementById('activation-key-input').value;
+            const errBox = document.getElementById('activation-error');
+            const result = validateActivationKey(deviceId, keyInput);
+
+            if (!result.valid) {
+                errBox.textContent = result.reason;
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            errBox.classList.add('hidden');
+            localStorage.setItem('u1v1_license_key_v1', keyInput.trim().toUpperCase());
+            unlockInterface(deviceId, result);
+        }
+
+        function deactivateLicense() {
+            if (confirm('Lock the application and clear the saved activation key on this device?')) {
+                localStorage.removeItem('u1v1_license_key_v1');
+                location.reload();
+            }
+        }
+
+        function initLicenseGate() {
+            const deviceId = getOrCreateDeviceId();
+            const devInput = document.getElementById('client-device-id');
+            if (devInput) devInput.value = deviceId;
+
+            const savedKey = localStorage.getItem('u1v1_license_key_v1');
+            if (savedKey) {
+                const check = validateActivationKey(deviceId, savedKey);
+                if (check.valid) {
+                    unlockInterface(deviceId, check);
+                    return;
+                } else {
+                    const errBox = document.getElementById('activation-error');
+                    if (errBox) {
+                        errBox.textContent = check.reason;
+                        errBox.classList.remove('hidden');
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // CORE APPLICATION DATA & LOGIC
+        // ==========================================
         const defaultApiConfigs = [
             { id: 'fallback-local', name: '⚡ Zero-Key Local Smart Fallback', provider: 'local', url: '', model: 'local-synthesizer', key: 'active' },
             { id: 'api-ollama', name: '🦙 Ollama Localhost (No Cloud Key)', provider: 'ollama', url: 'http://localhost:11434/v1/chat/completions', model: 'llama3.2', key: 'ollama' },
@@ -352,8 +646,6 @@
             { id: 'm30', name: 'Runway', category: 'media', rating: 4.7, email: 'dev@gmail.com', browser: 'Runway Dash', url: 'https://runwayml.com', pro: 'Cutting-edge cinematic video generation and editing tools.', con: 'Free generation seconds are very limited.', isCore: true, cheatsheetUrl: 'https://github.com/atryx/prompt-engineering-cheatsheet' },
             { id: 'm31', name: 'Synthesia', category: 'media', rating: 4.5, email: 'dev@gmail.com', browser: 'Synthesia Studio', url: 'https://www.synthesia.io', pro: 'Professional AI avatar presenter video creation.', con: 'High subscription cost for full commercial output.', isCore: true, cheatsheetUrl: 'https://github.com/atryx/prompt-engineering-cheatsheet' },
             { id: 'm32', name: 'ElevenLabs', category: 'media', rating: 4.9, email: 'dev@gmail.com', browser: 'Audio Space', url: 'https://elevenlabs.io', pro: 'Industry-leading ultra-realistic voice cloning & TTS.', con: 'Strict character monthly caps on free tier.', isCore: true, cheatsheetUrl: 'https://github.com/atryx/prompt-engineering-cheatsheet' },
-            
-            // TOP 10 ADDITIONAL FREE AI TOOLS
             { id: 'm33', name: 'Google Antigravity', category: 'coding', rating: 4.9, email: 'dev@gmail.com', browser: 'Antigravity IDE', url: 'https://antigravity.google', pro: 'Agent-first IDE with free weekly agent quotas & multi-file refactoring.', con: 'Subject to weekly rate limits during high usage.', isCore: true, cheatsheetUrl: 'https://github.com/atryx/prompt-engineering-cheatsheet' },
             { id: 'm34', name: 'Gemini CLI', category: 'coding', rating: 4.8, email: 'dev@gmail.com', browser: 'Local Terminal', url: 'https://github.com/google-gemini/gemini-cli', pro: 'Up to 1,000 free model requests/day directly in your local terminal.', con: 'Requires Node.js CLI setup and Google account auth.', isCore: true, cheatsheetUrl: 'https://github.com/atryx/prompt-engineering-cheatsheet' },
             { id: 'm35', name: 'Continue.dev', category: 'coding', rating: 4.8, email: 'local@device', browser: 'VS Code Ext', url: 'https://www.continue.dev', pro: '100% open-source IDE autocomplete & chat with zero vendor lock-in.', con: 'Requires bringing your own free API key or local Ollama server.', isCore: true, cheatsheetUrl: 'https://github.com/atryx/prompt-engineering-cheatsheet' },
@@ -370,7 +662,7 @@
             { sender: 'ai', text: 'Hello! I am your U1V1-FaHaM AI assistant connected to your streaming pipeline, file attachments, chat backup, and automatic fallback protection. Ask me anything!', attachments: [] }
         ];
 
-        let savedApiConfigs = JSON.parse(localStorage.getItem('faham_api_v32')) || JSON.parse(localStorage.getItem('faham_api_v31')) || JSON.parse(localStorage.getItem('faham_api_v30')) || JSON.parse(localStorage.getItem('faham_api_v29')) || JSON.parse(localStorage.getItem('faham_api_v28')) || defaultApiConfigs;
+        let savedApiConfigs = JSON.parse(localStorage.getItem('faham_api_v33')) || JSON.parse(localStorage.getItem('faham_api_v32')) || JSON.parse(localStorage.getItem('faham_api_v31')) || defaultApiConfigs;
         if (!savedApiConfigs.some(c => c.id === 'api-ollama' || c.provider === 'ollama')) {
             savedApiConfigs.splice(1, 0, defaultApiConfigs[1]);
         }
@@ -387,16 +679,16 @@
             currentTab: 'generator',
             activeCategory: 'all',
             apiConfigs: savedApiConfigs,
-            tools: JSON.parse(localStorage.getItem('faham_vault_v32')) || JSON.parse(localStorage.getItem('faham_vault_v31')) || JSON.parse(localStorage.getItem('faham_vault_v30')) || JSON.parse(localStorage.getItem('faham_vault_v29')) || masterTools,
-            history: JSON.parse(localStorage.getItem('faham_history_v32')) || JSON.parse(localStorage.getItem('faham_history_v31')) || JSON.parse(localStorage.getItem('faham_history_v30')) || JSON.parse(localStorage.getItem('faham_history_v29')) || JSON.parse(localStorage.getItem('faham_history_v28')) || [],
-            chatMessages: JSON.parse(localStorage.getItem('faham_chat_v32')) || defaultWelcomeChat
+            tools: JSON.parse(localStorage.getItem('faham_vault_v33')) || JSON.parse(localStorage.getItem('faham_vault_v32')) || masterTools,
+            history: JSON.parse(localStorage.getItem('faham_history_v33')) || JSON.parse(localStorage.getItem('faham_history_v32')) || [],
+            chatMessages: JSON.parse(localStorage.getItem('faham_chat_v33')) || JSON.parse(localStorage.getItem('faham_chat_v32')) || defaultWelcomeChat
         };
 
         function persistState() {
-            localStorage.setItem('faham_api_v32', JSON.stringify(appState.apiConfigs));
-            localStorage.setItem('faham_vault_v32', JSON.stringify(appState.tools));
-            localStorage.setItem('faham_history_v32', JSON.stringify(appState.history));
-            localStorage.setItem('faham_chat_v32', JSON.stringify(appState.chatMessages));
+            localStorage.setItem('faham_api_v33', JSON.stringify(appState.apiConfigs));
+            localStorage.setItem('faham_vault_v33', JSON.stringify(appState.tools));
+            localStorage.setItem('faham_history_v33', JSON.stringify(appState.history));
+            localStorage.setItem('faham_chat_v33', JSON.stringify(appState.chatMessages));
             
             const backupPayload = JSON.stringify(appState, null, 2);
             localStorage.setItem('faham_auto_snapshot_backup', backupPayload);
@@ -1130,6 +1422,7 @@ export default function ${title.replace(/[^a-zA-Z0-9]/g, '')}() {
 
         function escapeHtml(text) { return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
+        initLicenseGate();
         autofillPreset();
         renderApp();
     </script>
